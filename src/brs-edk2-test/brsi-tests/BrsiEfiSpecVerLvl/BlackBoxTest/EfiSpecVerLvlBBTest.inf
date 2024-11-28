@@ -1,0 +1,54 @@
+#
+#  Copyright 2006 - 2016 Unified EFI, Inc. All
+#  Rights Reserved, subject to all existing rights in all
+#  matters included within this Test Suite, to which United
+#  EFI, Inc. makes no claim of right.
+#
+#  Copyright (c) 2016, ARM. All rights reserved.
+#  Copyright (c) 2024 Intel Corporation
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#/*++
+#
+# Module Name:
+#
+#   EfiSpecVerLvlBBTest.inf
+#
+# Abstract:
+#
+#   Component description file for BRS Specification Version Level test.
+#
+#--*/
+
+[Defines]
+  INF_VERSION          = 0x00010019
+  BASE_NAME            = EfiSpecVerLvlBBTest
+  FILE_GUID            = f865a18a-9b47-420d-97ae-676d8016a513
+  MODULE_TYPE          = UEFI_DRIVER
+  VERSION_STRING       = 1.0
+  ENTRY_POINT          = InitializeBBTestEfiSpecVerLvl
+
+[Sources.common]
+  EfiSpecVerLvlBBTestFunction.c
+  EfiSpecVerLvlBBTestMain.c
+  Guid.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SctPkg/SctPkg.dec
+  SctPkg/UEFI/UEFI.dec
+
+[LibraryClasses]
+  EfiTestLib
+  SctLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gBlackBoxEfiBlockIoProtocolGuid

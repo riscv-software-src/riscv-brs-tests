@@ -1,0 +1,53 @@
+From 781753365558a2f97939395f95311162d16274cf Mon Sep 17 00:00:00 2001
+From: Zhu Hengbo <zhuhengbo@iscas.ac.cn>
+Date: Tue, 5 Nov 2024 02:00:58 +0000
+Subject: [PATCH] Remove invalid submodule
+
+Signed-off-by: Zhu Hengbo <zhuhengbo@iscas.ac.cn>
+---
+ .gitmodules                                     | 14 +++++++-------
+ UnitTestFrameworkPkg/Library/SubhookLib/subhook |  1 -
+ 2 files changed, 7 insertions(+), 8 deletions(-)
+ delete mode 160000 UnitTestFrameworkPkg/Library/SubhookLib/subhook
+
+diff --git a/.gitmodules b/.gitmodules
+index 387794f05e..2a935e539b 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -16,19 +16,19 @@
+ [submodule "BaseTools/Source/C/BrotliCompress/brotli"]
+ 	path = BaseTools/Source/C/BrotliCompress/brotli
+ 	url = https://github.com/google/brotli
+-	ignore = untracked
++	ignore = untracked
+ [submodule "RedfishPkg/Library/JsonLib/jansson"]
+ 	path = RedfishPkg/Library/JsonLib/jansson
+ 	url = https://github.com/akheron/jansson
+ [submodule "UnitTestFrameworkPkg/Library/GoogleTestLib/googletest"]
+ 	path = UnitTestFrameworkPkg/Library/GoogleTestLib/googletest
+ 	url = https://github.com/google/googletest.git
+-[submodule "UnitTestFrameworkPkg/Library/SubhookLib/subhook"]
+-	path = UnitTestFrameworkPkg/Library/SubhookLib/subhook
+-	url = https://github.com/Zeex/subhook.git
+-[submodule "MdePkg/Library/BaseFdtLib/libfdt"]
+-	path = MdePkg/Library/BaseFdtLib/libfdt
+-	url = https://github.com/devicetree-org/pylibfdt.git
++# [submodule "UnitTestFrameworkPkg/Library/SubhookLib/subhook"]
++# 	path = UnitTestFrameworkPkg/Library/SubhookLib/subhook
++#	url = https://github.com/Zeex/subhook.git
++[submodule "MdePkg/Library/BaseFdtLib/libfdt"]
++	path = MdePkg/Library/BaseFdtLib/libfdt
++	url = https://github.com/devicetree-org/pylibfdt.git
+ [submodule "MdePkg/Library/MipiSysTLib/mipisyst"]
+ 	path = MdePkg/Library/MipiSysTLib/mipisyst
+ 	url = https://github.com/MIPI-Alliance/public-mipi-sys-t.git
+diff --git a/UnitTestFrameworkPkg/Library/SubhookLib/subhook b/UnitTestFrameworkPkg/Library/SubhookLib/subhook
+deleted file mode 160000
+index 83d4e1ebef..0000000000
+--- a/UnitTestFrameworkPkg/Library/SubhookLib/subhook
++++ /dev/null
+@@ -1 +0,0 @@
+-Subproject commit 83d4e1ebef3588fae48b69a7352cc21801cb70bc
+-- 
+2.34.1
+
