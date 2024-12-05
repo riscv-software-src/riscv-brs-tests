@@ -26,15 +26,15 @@ BRS_IMAGE_XZ=$BRS_IMAGE.xz
 BRS_IMAGE_DIR=$TARGET_DIR/brs-image
 
 BRS_GRUB_RISCV64_EFI_FILE=$SRC_DIR/brs-grub/grub/output/grubriscv64.efi
-BRS_UEFI_SHELL_EFI_FILE=$SRC_DIR/brs-edk2-test/edk2-test/uefi-sct/Build/Shell/DEBUG_GCC5/RISCV64/ShellPkg/Application/Shell/Shell/OUTPUT/Shell.efi
+BRS_UEFI_SHELL_EFI_FILE=$SRC_DIR/brs-edk2-test/edk2-test/uefi-sct/Build/Shell/RELEASE_GCC5/RISCV64/ShellPkg/Application/Shell/Shell/OUTPUT/Shell.efi
 BRS_LINUX_IMAGE=$SRC_DIR/brs-linux/linux/arch/riscv/boot/Image
 BRS_RAMDISK_BUILDROOT_IMAGE=$SRC_DIR/brs-buildroot/buildroot/output/images/rootfs.cpio
 
 BRS_UEFI_SCT_PATH=$SRC_DIR/brs-edk2-test/edk2-test/uefi-sct/RISCV64_SCT
 
 BRS_GRUB_BUILDROOT_CFG_FILE=$SRC_DIR/brs-grub/config/grub-buildroot.cfg
-BRS_EFI_CONFIG_SCRIPT=$SCRIPTS_DIR/BRSIStartup.nsh
-BRS_EFI_SCT_STARTUP_SCRIPT=$SCRIPTS_DIR/startup.nsh
+BRS_EFI_CONFIG_SCRIPT=$SCRIPTS_DIR/startup.nsh
+BRS_EFI_SCT_STARTUP_SCRIPT=$SCRIPTS_DIR/BRSIStartup.nsh
 BRS_EFI_DEBUG_CONFIG_SCRIPT=$SCRIPTS_DIR/debug_dump.nsh
 
 BRS_BLOCK_SIZE=512
@@ -191,9 +191,9 @@ brs_buildimage()
     echo "Compressing the image : $BRS_IMAGE"
     xz -z $BRS_IMAGE
 
-    if [ -f $PLATDIR/$IMG_BB.xz ]; then
+    if [ -f $PLATDIR/$BRS_IMAGE.xz ]; then
         echo "Completed preparation of disk image for busybox boot"
-        echo "Image path : $PLATDIR/$IMG_BB.xz"
+        echo "Image path : $PLATDIR/$BRS_IMAGE.xz"
     fi
     echo "----------------------------------------------------"
 
