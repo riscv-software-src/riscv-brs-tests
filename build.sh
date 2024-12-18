@@ -104,7 +104,9 @@ brs_buildimage() {
     
     local FAT_SIZE_MB=512  
     local FAT2_SIZE_MB=128  
-    local PART_START=$((1 * 2048))  # Assuming 2048 sectors for 1MB  
+    
+    # Assuming 2048 sectors for 1MB
+    local PART_START=$((1 * 2048)) 
     local FAT_SIZE=$((FAT_SIZE_MB * 2048))  
     local FAT2_SIZE=$((FAT2_SIZE_MB * 2048))  
 
@@ -112,30 +114,44 @@ brs_buildimage() {
     mkdir -p "$BRS_IMAGE_DIR"  
     pushd "$BRS_IMAGE_DIR" > /dev/null  
 
+    #Package images for Busybox
     echo "Creating disk image..."  
     dd if=/dev/zero of="$BRS_IMAGE" bs=$BRS_BLOCK_SIZE count=$((PART_START + FAT_SIZE + FAT2_SIZE + 2048))  
 
     echo "Creating FAT partitions..."  
-    mkfs.vfat -n "BOOT" "$BRS_IMAGE" # Create first FAT partition  
-    mkfs.vfat -n "RESULT" "$BRS_IMAGE" # Create second FAT partition  
+    # Create first FAT partition
+    mkfs.vfat -n "BOOT" "$BRS_IMAGE"   
+    
+    # Create second FAT partition
+    mkfs.vfat -n "RESULT" "$BRS_IMAGE"  
 
     echo "Disk image created: $BRS_IMAGE"  
     popd > /dev/null  
 }  
 
 brs_install() {  
+    # install qemu
     echo "Installing components..."  
     mkdir -p "$TARGET_DIR/qemu"  
     cp -r "$SRC_DIR/brs-qemu/qemu/build" "$TARGET_DIR/qemu/"  
+    
+    # install bios
     cp "$SRC_DIR/brs-opensbi/opensbi/build/platform/generic/firmware/fw_dynamic.bin" "$TARGET_DIR/"  
+    
+    # install sct test
     cp "$SRC_DIR/brs-edk2/edk2/Build/RiscVVirtQemu/RELEASE_GCC5/FV/RISCV_VIRT_CODE.fd" "$TARGET_DIR/"  
     cp "$SRC_DIR/brs-edk2/edk2/Build/RiscVVirtQemu/RELEASE_GCC5/FV/RISCV_VIRT_VARS.fd" "$TARGET_DIR/"  
+    
+    # install image xz file
     cp "$BRS_IMAGE_DIR/$BRS_IMAGE_XZ" "$TARGET_DIR/"  
+    
+    # install scripts
     cp "$SCRIPTS_DIR/start_uefi_sct.sh" "$TARGET_DIR/"  
     echo "Installation complete."  
 }  
 
 brs_clean() {  
+    # remove tmp dir for brs image build
     echo "Cleaning up temporary files..."  
     rm -rf "$BRS_IMAGE_DIR"  
 }  
