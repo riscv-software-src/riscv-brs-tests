@@ -1,5 +1,6 @@
 #!/bin/bash
 # Copyright 2024, ISCAS. All rights reserved.
+# Copyright (c) 2024, Academy of Intelligent Innovation, Shandong Universiy, China.P.R. All rights reserved.<BR>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,10 +53,23 @@ brs_compile_component() {
     for i in "${!components[@]}"; do  
         echo "$((i + 1)). ${components[$i]}"  
     done  
+    echo "C. Compile All Components"  
     echo "0. Back to main menu"  
     
-    read -rp "Please choose an option (0-$((${#components[@]}))): " selection  
-    if [[ $selection -eq 0 ]]; then  
+    read -rp "Please choose an option (0-C): " selection  
+    if [[ $selection == '0' ]]; then  
+        return  
+    elif [[ $selection == 'C' ]]; then  
+        for component in "${components[@]}"; do  
+            echo "Compiling $component..."  
+            pushd "$SRC_DIR/brs-$component" > /dev/null  
+            if make; then  
+                echo "$component compiled successfully."  
+            else  
+                echo "Failed to compile $component."  
+            fi  
+            popd > /dev/null  
+        done  
         return  
     elif [[ $selection -ge 1 && $selection -le ${#components[@]} ]]; then  
         local component=${components[$((selection - 1))]}  
@@ -162,7 +176,7 @@ while true; do
             ;;  
         6)  
             echo "Exiting... Returning to terminal."  
-            break  # 退出循环，而不是结束整个终端  
+            break  
             ;;  
         *)  
             echo "Invalid option, please try again."  
