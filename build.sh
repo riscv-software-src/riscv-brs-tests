@@ -56,10 +56,51 @@ brs_compile_component() {
     echo "C. Compile All Components"  
     echo "0. Back to main menu"  
     
-    read -rp "Please choose an option (0-C): " selection  
+    # Controlled countdown function  
+    countdown() {  
+        local remaining=10  
+        local selection=""  
+        
+        # Use stty to disable input buffering  
+        stty -icanon -echo min 0 time 10  
+        
+        while [ $remaining -gt 0 ]; do  
+            # Output countdown to stderr to ensure visibility  
+            printf "\r\033[K" >&2  
+            printf "Time remaining: %2d seconds | Select option (1-9, C, 0): " "$remaining" >&2  
+            
+            # Non-blocking read  
+            read -t 1 input  
+            
+            # Process input immediately  
+            if [[ -n "$input" ]]; then  
+                if [[ "$input" =~ ^[1-9Cc0]$ ]]; then  
+                    selection="$input"  
+                    break  
+                fi  
+            fi  
+            
+            ((remaining--))  
+        done  
+        
+        # Restore terminal settings  
+        stty icanon echo  
+        
+        # Return selection or default to 'C'  
+        if [[ -z "$selection" ]]; then  
+            echo "C"  
+        else  
+            echo "$selection"  
+        fi  
+    }  
+
+    # Get selection from countdown  
+    selection=$(countdown)  
+
+    # Compilation logic  
     if [[ $selection == '0' ]]; then  
         return  
-    elif [[ $selection == 'C' ]]; then  
+    elif [[ $selection == 'C' || $selection == 'c' || -z "$selection" ]]; then  
         for component in "${components[@]}"; do  
             echo "Compiling $component..."  
             pushd "$SRC_DIR/brs-$component" > /dev/null  
@@ -84,7 +125,7 @@ brs_compile_component() {
     else  
         echo "Invalid selection. Returning to main menu."  
     fi  
-}  
+}
 
 brs_compile() {  
     while true; do  
