@@ -71,31 +71,25 @@ brs_compile()
     make
     popd
 
-    # 5. compile edk2-test-parser
-    echo "Compiling edk2-test-parser..."
-    pushd $SRC_DIR/brs-edk2-test-parser
-    make
-    popd
-
-    # 6. compile buildroot
+    # 5. compile buildroot
     echo "Compiling buildroot..."
     pushd $SRC_DIR/brs-buildroot
     make
     popd
 
-    # 7. compile opensbi
+    # 6. compile opensbi
     echo "Compiling opensbi..."
     pushd $SRC_DIR/brs-opensbi
     make
     popd
 
-    # 8. compile sbi-test
+    # 7. compile sbi-test
     echo "Compiling sbi-test..."
     pushd $SRC_DIR/brs-sbi-test
     make
     popd
 
-    # 9. compile qemu
+    # 8. compile qemu
     echo "Compiling Qemu..."
     pushd $SRC_DIR/brs-qemu
     make
