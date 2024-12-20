@@ -20,7 +20,7 @@ BRS_OPENSBI_CROSS_COMPILE = riscv64-linux-gnu-
 BRS_OPENSBI_TARGET = brs-opensbi
 BRS_OPENSBI_REPOURL = git@github.com:riscv-software-src/opensbi.git
 BRS_OPENSBI_BRANCH = brs-test
-BRS_OPENSBI_TAG = v1.3.1
+BRS_OPENSBI_TAG = v1.4
 # BRS_OPENSBI_COMMIT = 057eb10b6d523540012e6947d5c9f63e95244e94
 
 .PHONY: brs-opensbi
