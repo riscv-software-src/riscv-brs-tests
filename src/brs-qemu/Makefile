@@ -38,14 +38,10 @@ brs-qemu:
 			echo "stg command not found. Please install stgit to apply patches."
 			exit 1
 		fi
-
-		stg init
-		stg import -s ../patches/series
 		popd
 	fi
 
 	pushd qemu
-	@git submodule update --init --recursive --progress
 
 	@if [ ! -d "roms/edk2" ]; then
 		echo "Copying edk2 source..."
