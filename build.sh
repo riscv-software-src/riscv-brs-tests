@@ -155,19 +155,86 @@ brs_buildimage() {
     mkdir -p "$BRS_IMAGE_DIR"  
     pushd "$BRS_IMAGE_DIR" > /dev/null  
 
+    cp $BRS_GRUB_RISCV64_EFI_FILE bootriscv64.efi
+    cp $BRS_UEFI_SHELL_EFI_FILE Shell.efi
+    cp $BRS_LINUX_IMAGE Image
+    cp $BRS_RAMDISK_BUILDROOT_IMAGE ramdisk-buildroot.img
+
+    cp -Tr $BRS_UEFI_SCT_PATH SCT
+    grep -q -F 'mtools_skip_check=1' ~/.mtoolsrc || echo "mtools_skip_check=1" >> ~/.mtoolsrc
+
     #Package images for Busybox
-    echo "Creating disk image..."  
-    dd if=/dev/zero of="$BRS_IMAGE" bs=$BRS_BLOCK_SIZE count=$((PART_START + FAT_SIZE + FAT2_SIZE + 2048))  
+    dd if=/dev/zero of=part_table bs=$BRS_BLOCK_SIZE count=$PART_START
 
-    echo "Creating FAT partitions..."  
-    # Create first FAT partition
-    mkfs.vfat -n "BOOT" "$BRS_IMAGE"   
-    
-    # Create second FAT partition
-    mkfs.vfat -n "RESULT" "$BRS_IMAGE"  
+    #Space for partition table at the top
+    cat part_table > $BRS_IMAGE
 
-    echo "Disk image created: $BRS_IMAGE"  
-    popd > /dev/null  
+    #Create fat partition
+    local fatpart_name="BOOT"  #Name of the FAT partition disk image
+    local fatpart_size=$FAT_SIZE  #FAT partition size (in 512-byte blocks)
+
+    dd if=/dev/zero of=$fatpart_name bs=$BRS_BLOCK_SIZE count=$fatpart_size
+    mkfs.vfat $fatpart_name -n $fatpart_name
+    mmd -i $fatpart_name ::/EFI
+    mmd -i $fatpart_name ::/EFI/BOOT
+    mmd -i $fatpart_name ::/grub
+
+    mmd -i $fatpart_name ::/EFI/BOOT/brs
+    mmd -i $fatpart_name ::/EFI/BOOT/debug
+    mmd -i $fatpart_name ::/EFI/BOOT/app
+
+    mcopy -i $fatpart_name bootriscv64.efi        ::/EFI/BOOT
+    mcopy -i $fatpart_name Shell.efi              ::/EFI/BOOT
+    mcopy -i $fatpart_name Image                  ::/
+    mcopy -i $fatpart_name ramdisk-buildroot.img  ::/
+
+    mcopy -s -i $fatpart_name SCT/* ::/EFI/BOOT/brs
+    # mcopy -i $fatpart_name ${UEFI_APPS_PATH}/CapsuleApp.efi ::/EFI/BOOT/app
+    echo "FAT partition image created"
+
+    mcopy -i  $fatpart_name -o ${BRS_GRUB_BUILDROOT_CFG_FILE}     ::/grub.cfg
+    mcopy -i  $fatpart_name -o ${BRS_EFI_SCT_STARTUP_SCRIPT}      ::/EFI/BOOT/brs/
+    mcopy -i  $fatpart_name -o ${BRS_EFI_CONFIG_SCRIPT}           ::/EFI/BOOT/
+    mcopy -i  $fatpart_name -o ${BRS_EFI_DEBUG_CONFIG_SCRIPT}     ::/EFI/BOOT/debug/
+    cat BOOT >> $BRS_IMAGE
+
+    #Result partition
+    local fatpart2_name="RESULT"  #Name of the FAT partition disk image
+    local fatpart2_size=$FAT2_SIZE  #FAT partition size (in 512-byte blocks)
+
+    dd if=/dev/zero of=$fatpart2_name bs=$BRS_BLOCK_SIZE count=$fatpart2_size
+    mkfs.vfat $fatpart2_name -n $fatpart2_name
+    mmd -i $fatpart2_name ::/acs_results
+    echo "FAT partition 2 image created"
+    cat RESULT >> $BRS_IMAGE
+
+    # Space for backup partition table at the bottom (1M)
+    cat part_table >> $BRS_IMAGE
+
+    # create disk image and copy into output folder
+    local image_name=$BRS_IMAGE
+    local part_start=$PART_START
+
+    (echo n; echo 1; echo $part_start; echo +$((fatpart_size-1));\
+    echo 0700; echo w; echo y) | gdisk $image_name
+    (echo n; echo 2; echo $((part_start+fatpart_size)); echo +$((fatpart2_size-1));\
+    echo 0700; echo w; echo y) | gdisk $image_name
+
+    #remove intermediate files
+    rm -f part_table
+    rm -f BOOT
+    rm -f RESULT
+
+    echo "Compressing the image : $BRS_IMAGE"
+    xz -z $BRS_IMAGE
+
+    if [ -f $PLATDIR/$BRS_IMAGE.xz ]; then
+        echo "Completed preparation of disk image for busybox boot"
+        echo "Image path : $PLATDIR/$BRS_IMAGE.xz"
+    fi
+    echo "----------------------------------------------------"
+
+    popd 
 }  
 
 brs_install() {  
@@ -211,32 +278,106 @@ show_menu() {
     echo "------------------------"  
 }  
 
-# Main loop  
-while true; do  
-    show_menu  
-    read -rp "Please choose an option (1-6): " choice  
-    case "$choice" in  
-        1)  
-            brs_init  
-            ;;  
-        2)  
-            brs_compile  
-            ;;  
-        3)  
-            brs_buildimage  
-            ;;  
-        4)  
-            brs_install  
-            ;;  
-        5)  
-            brs_clean  
-            ;;  
-        6)  
-            echo "Exiting... Returning to terminal."  
-            break  
-            ;;  
-        *)  
-            echo "Invalid option, please try again."  
-            ;;  
-    esac  
-done
+show_menu_with_countdown() {
+    local options=("Initialize" "Compile" "Build Image" "Install" "Clean" "Exit")
+
+    while true; do
+        show_menu
+
+        countdown() {  
+            local remaining=10  
+            local selection=""  
+        
+            # Use stty to disable input buffering  
+            stty -icanon -echo min 0 time 10  
+        
+            while [ $remaining -gt 0 ]; do  
+                # Output countdown to stderr to ensure visibility  
+                printf "\r\033[K" >&2  
+                printf "Time remaining: %2d seconds | Select option (1-6): " "$remaining" >&2  
+            
+                # Non-blocking read  
+                read -t 1 input  
+            
+                # Process input immediately  
+                if [[ -n "$input" ]]; then  
+                    if [[ "$input" =~ ^[1-6]$ ]]; then  
+                        selection="$input"  
+                        break  
+                    fi  
+                fi  
+            
+                ((remaining--))  
+            done  
+        
+            # Restore terminal settings  
+            stty icanon echo  
+        
+            # Return selection or default to 'C'  
+            if [[ -z "$selection" ]]; then  
+                echo "C"  
+            else  
+                echo "$selection"  
+            fi  
+        }  
+    
+        # Get selection from countdown  
+        selection=$(countdown)  
+
+        if [[ $selection == 'C' || -z "$selection" ]]; then 
+            for i in {1..6}; do
+                case $i in
+                    1)
+                        brs_init
+                        ;;
+                    2)
+                        brs_compile
+                        ;;
+                    3)
+                        brs_buildimage
+                        ;;
+                    4)
+                        brs_install
+                        ;;
+                    5)
+                        brs_clean
+                        ;;
+                    6)
+                        echo "Exiting... Returning to terminal."
+                        break  # exit function
+                        ;;
+                esac
+            done
+            break
+        else
+            case "$selection" in
+                1)
+                    brs_init
+                    ;;
+                2)
+                    brs_compile
+                    ;;
+                3)
+                    brs_buildimage
+                    ;;
+                4)
+                    brs_install
+                    ;;
+                5)
+                    brs_clean
+                    ;;
+                6)
+                    echo "Exiting... Returning to terminal."
+                    break  # exit function
+                    ;;
+                *)
+                    # Invalid option
+                    echo "Invalid option, please try again"
+                    ;;
+            esac
+        fi
+    done
+}
+
+# Start execute  
+show_menu_with_countdown
