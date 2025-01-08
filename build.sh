@@ -46,7 +46,7 @@ brs_init() {
     rm -rf "$TARGET_DIR"  
 }  
 
-brs_compile_component() {  
+brs_compile() {  
     local components=("linux" "grub" "edk2" "edk2-test" "edk2-test-parser" "buildroot" "opensbi" "sbi-test" "qemu")  
     
     echo "Select a component to compile:"  
@@ -126,16 +126,6 @@ brs_compile_component() {
         echo "Invalid selection. Returning to main menu."  
     fi  
 }
-
-brs_compile() {  
-    while true; do  
-        brs_compile_component  
-        read -rp "Compile another component? (y/n): " choice  
-        if [[ "$choice" != "y" ]]; then  
-            break  
-        fi  
-    done  
-}  
 
 brs_buildimage() {  
     echo  
