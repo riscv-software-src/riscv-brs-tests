@@ -14,136 +14,136 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#!/bin/bash  
-set -e  
+#!/bin/bash
+set -e
 
-# Variables  
-SRC_DIR="$(pwd)/src"  
-TARGET_DIR="$(pwd)/target"  
-SCRIPTS_DIR="$(pwd)/scripts"  
+# Variables
+SRC_DIR="$(pwd)/src"
+TARGET_DIR="$(pwd)/target"
+SCRIPTS_DIR="$(pwd)/scripts"
 
-BRS_IMAGE="brs_live_image.img"  
-BRS_IMAGE_XZ="$BRS_IMAGE.xz"  
-BRS_IMAGE_DIR="$TARGET_DIR/brs-image"  
+BRS_IMAGE="brs_live_image.img"
+BRS_IMAGE_XZ="$BRS_IMAGE.xz"
+BRS_IMAGE_DIR="$TARGET_DIR/brs-image"
 
-BRS_GRUB_RISCV64_EFI_FILE="$SRC_DIR/brs-grub/grub/output/grubriscv64.efi"  
-BRS_UEFI_SHELL_EFI_FILE="$SRC_DIR/brs-edk2-test/edk2-test/uefi-sct/Build/Shell/RELEASE_GCC5/RISCV64/ShellPkg/Application/Shell/Shell/OUTPUT/Shell.efi"  
-BRS_LINUX_IMAGE="$SRC_DIR/brs-linux/linux/arch/riscv/boot/Image"  
-BRS_RAMDISK_BUILDROOT_IMAGE="$SRC_DIR/brs-buildroot/buildroot/output/images/rootfs.cpio"  
+BRS_GRUB_RISCV64_EFI_FILE="$SRC_DIR/brs-grub/grub/output/grubriscv64.efi"
+BRS_UEFI_SHELL_EFI_FILE="$SRC_DIR/brs-edk2-test/edk2-test/uefi-sct/Build/Shell/RELEASE_GCC5/RISCV64/ShellPkg/Application/Shell/Shell/OUTPUT/Shell.efi"
+BRS_LINUX_IMAGE="$SRC_DIR/brs-linux/linux/arch/riscv/boot/Image"
+BRS_RAMDISK_BUILDROOT_IMAGE="$SRC_DIR/brs-buildroot/buildroot/output/images/rootfs.cpio"
 
-BRS_UEFI_SCT_PATH="$SRC_DIR/brs-edk2-test/edk2-test/uefi-sct/RISCV64_SCT"  
+BRS_UEFI_SCT_PATH="$SRC_DIR/brs-edk2-test/edk2-test/uefi-sct/RISCV64_SCT"
 
-BRS_GRUB_BUILDROOT_CFG_FILE="$SRC_DIR/brs-grub/config/grub-buildroot.cfg"  
-BRS_EFI_CONFIG_SCRIPT="$SCRIPTS_DIR/startup.nsh"  
-BRS_EFI_SCT_STARTUP_SCRIPT="$SCRIPTS_DIR/BRSIStartup.nsh"  
-BRS_EFI_DEBUG_CONFIG_SCRIPT="$SCRIPTS_DIR/debug_dump.nsh"  
+BRS_GRUB_BUILDROOT_CFG_FILE="$SRC_DIR/brs-grub/config/grub-buildroot.cfg"
+BRS_EFI_CONFIG_SCRIPT="$SCRIPTS_DIR/startup.nsh"
+BRS_EFI_SCT_STARTUP_SCRIPT="$SCRIPTS_DIR/BRSIStartup.nsh"
+BRS_EFI_DEBUG_CONFIG_SCRIPT="$SCRIPTS_DIR/debug_dump.nsh"
 
-BRS_BLOCK_SIZE=512  
+BRS_BLOCK_SIZE=512
+BRS_SEC_PER_MB=$((1024*2))
 
-# Functions  
-brs_init() {  
-    echo "Initializing the target directory..."  
-    rm -rf "$TARGET_DIR"  
-}  
-
-brs_compile() {  
-    local components=("linux" "grub" "edk2" "edk2-test" "edk2-test-parser" "buildroot" "opensbi" "sbi-test" "qemu")  
-    
-    echo "Select a component to compile:"  
-    for i in "${!components[@]}"; do  
-        echo "$((i + 1)). ${components[$i]}"  
-    done  
-    echo "C. Compile All Components"  
-    echo "0. Back to main menu"  
-    
-    # Controlled countdown function  
-    countdown() {  
-        local remaining=10  
-        local selection=""  
-        
-        # Use stty to disable input buffering  
-        stty -icanon -echo min 0 time 10  
-        
-        while [ $remaining -gt 0 ]; do  
-            # Output countdown to stderr to ensure visibility  
-            printf "\r\033[K" >&2  
-            printf "Time remaining: %2d seconds | Select option (1-9, C, 0): " "$remaining" >&2  
-            
-            # Non-blocking read  
-            read -t 1 input  
-            
-            # Process input immediately  
-            if [[ -n "$input" ]]; then  
-                if [[ "$input" =~ ^[1-9Cc0]$ ]]; then  
-                    selection="$input"  
-                    break  
-                fi  
-            fi  
-            
-            ((remaining--))  
-        done  
-        
-        # Restore terminal settings  
-        stty icanon echo  
-        
-        # Return selection or default to 'C'  
-        if [[ -z "$selection" ]]; then  
-            echo "C"  
-        else  
-            echo "$selection"  
-        fi  
-    }  
-
-    # Get selection from countdown  
-    selection=$(countdown)  
-
-    # Compilation logic  
-    if [[ $selection == '0' ]]; then  
-        return  
-    elif [[ $selection == 'C' || $selection == 'c' || -z "$selection" ]]; then  
-        for component in "${components[@]}"; do  
-            echo "Compiling $component..."  
-            pushd "$SRC_DIR/brs-$component" > /dev/null  
-            if make; then  
-                echo "$component compiled successfully."  
-            else  
-                echo "Failed to compile $component."  
-            fi  
-            popd > /dev/null  
-        done  
-        return  
-    elif [[ $selection -ge 1 && $selection -le ${#components[@]} ]]; then  
-        local component=${components[$((selection - 1))]}  
-        echo "Compiling $component..."  
-        pushd "$SRC_DIR/brs-$component" > /dev/null  
-        if make; then  
-            echo "$component compiled successfully."  
-        else  
-            echo "Failed to compile $component."  
-        fi  
-        popd > /dev/null  
-    else  
-        echo "Invalid selection. Returning to main menu."  
-    fi  
+# Functions
+brs_init() {
+    echo "Initializing the target directory..."
+    rm -rf "$TARGET_DIR"
 }
 
-brs_buildimage() {  
-    echo  
-    echo "-------------------------------------"  
-    echo "Preparing disk image for busybox boot"  
-    echo "-------------------------------------"  
-    
-    local FAT_SIZE_MB=512  
-    local FAT2_SIZE_MB=128  
-    
-    # Assuming 2048 sectors for 1MB
-    local PART_START=$((1 * 2048)) 
-    local FAT_SIZE=$((FAT_SIZE_MB * 2048))  
-    local FAT2_SIZE=$((FAT2_SIZE_MB * 2048))  
+brs_compile() {
+    local components=("linux" "grub" "edk2" "edk2-test" "buildroot" "opensbi" "sbi-test" "qemu")
 
-    rm -rf "$BRS_IMAGE_DIR"  
-    mkdir -p "$BRS_IMAGE_DIR"  
-    pushd "$BRS_IMAGE_DIR" > /dev/null  
+    echo "Select a component to compile:"
+    for i in "${!components[@]}"; do
+        echo "$((i + 1)). ${components[$i]}"
+    done
+    echo "C. Compile All Components"
+    echo "0. Back to main menu"
+
+    # Controlled countdown function
+    countdown() {
+        local remaining=10
+        local selection=""
+
+        # Use stty to disable input buffering
+        stty -icanon -echo min 0 time 10
+
+        while [ $remaining -gt 0 ]; do
+            # Output countdown to stderr to ensure visibility
+            printf "\r\033[K" >&2
+            printf "Time remaining: %2d seconds | Select option (1-9, C, 0): " "$remaining" >&2
+
+            # Non-blocking read
+            read -t 1 input
+
+            # Process input immediately
+            if [[ -n "$input" ]]; then
+                if [[ "$input" =~ ^[1-9Cc0]$ ]]; then
+                    selection="$input"
+                    break
+                fi
+            fi
+
+            ((remaining--))
+        done
+
+        # Restore terminal settings
+        stty icanon echo
+
+        # Return selection or default to 'C'
+        if [[ -z "$selection" ]]; then
+            echo "C"
+        else
+            echo "$selection"
+        fi
+    }
+
+    # Get selection from countdown
+    selection=$(countdown)
+
+    # Compilation logic
+    if [[ $selection == '0' ]]; then
+        return
+    elif [[ $selection == 'C' || $selection == 'c' || -z "$selection" ]]; then
+        for component in "${components[@]}"; do
+            echo "Compiling $component..."
+            pushd "$SRC_DIR/brs-$component" > /dev/null
+            if make; then
+                echo "$component compiled successfully."
+            else
+                echo "Failed to compile $component."
+            fi
+            popd > /dev/null
+        done
+        return
+    elif [[ $selection -ge 1 && $selection -le ${#components[@]} ]]; then
+        local component=${components[$((selection - 1))]}
+        echo "Compiling $component..."
+        pushd "$SRC_DIR/brs-$component" > /dev/null
+        if make; then
+            echo "$component compiled successfully."
+        else
+            echo "Failed to compile $component."
+        fi
+        popd > /dev/null
+    else
+        echo "Invalid selection. Returning to main menu."
+    fi
+}
+
+brs_buildimage() {
+    echo
+    echo "-------------------------------------"
+    echo "Preparing disk image for busybox boot"
+    echo "-------------------------------------"
+
+    local FAT_SIZE_MB=512
+    local FAT2_SIZE_MB=128
+
+    local PART_START=$((1 * BRS_SEC_PER_MB))
+    local FAT_SIZE=$((FAT_SIZE_MB * BRS_SEC_PER_MB))
+    local FAT2_SIZE=$((FAT2_SIZE_MB * BRS_SEC_PER_MB))
+
+    rm -rf "$BRS_IMAGE_DIR"
+    mkdir -p "$BRS_IMAGE_DIR"
+    pushd "$BRS_IMAGE_DIR" > /dev/null
 
     cp $BRS_GRUB_RISCV64_EFI_FILE bootriscv64.efi
     cp $BRS_UEFI_SHELL_EFI_FILE Shell.efi
@@ -224,49 +224,49 @@ brs_buildimage() {
     fi
     echo "----------------------------------------------------"
 
-    popd 
-}  
+    popd
+}
 
-brs_install() {  
+brs_install() {
     # install qemu
-    echo "Installing components..."  
-    mkdir -p "$TARGET_DIR/qemu"  
-    cp -r "$SRC_DIR/brs-qemu/qemu/build" "$TARGET_DIR/qemu/"  
-    
+    echo "Installing components..."
+    mkdir -p "$TARGET_DIR/qemu"
+    cp -r "$SRC_DIR/brs-qemu/qemu/build" "$TARGET_DIR/qemu/"
+
     # install bios
-    cp "$SRC_DIR/brs-opensbi/opensbi/build/platform/generic/firmware/fw_dynamic.bin" "$TARGET_DIR/"  
-    
+    cp "$SRC_DIR/brs-opensbi/opensbi/build/platform/generic/firmware/fw_dynamic.bin" "$TARGET_DIR/"
+
     # install sct test
-    cp "$SRC_DIR/brs-edk2/edk2/Build/RiscVVirtQemu/RELEASE_GCC5/FV/RISCV_VIRT_CODE.fd" "$TARGET_DIR/"  
-    cp "$SRC_DIR/brs-edk2/edk2/Build/RiscVVirtQemu/RELEASE_GCC5/FV/RISCV_VIRT_VARS.fd" "$TARGET_DIR/"  
-    
+    cp "$SRC_DIR/brs-edk2/edk2/Build/RiscVVirtQemu/RELEASE_GCC5/FV/RISCV_VIRT_CODE.fd" "$TARGET_DIR/"
+    cp "$SRC_DIR/brs-edk2/edk2/Build/RiscVVirtQemu/RELEASE_GCC5/FV/RISCV_VIRT_VARS.fd" "$TARGET_DIR/"
+
     # install image xz file
-    cp "$BRS_IMAGE_DIR/$BRS_IMAGE_XZ" "$TARGET_DIR/"  
-    
+    cp "$BRS_IMAGE_DIR/$BRS_IMAGE_XZ" "$TARGET_DIR/"
+
     # install scripts
-    cp "$SCRIPTS_DIR/start_uefi_sct.sh" "$TARGET_DIR/"  
-    echo "Installation complete."  
-}  
+    cp "$SCRIPTS_DIR/start_uefi_sct.sh" "$TARGET_DIR/"
+    echo "Installation complete."
+}
 
-brs_clean() {  
+brs_clean() {
     # remove tmp dir for brs image build
-    echo "Cleaning up temporary files..."  
-    rm -rf "$BRS_IMAGE_DIR"  
-}  
+    echo "Cleaning up temporary files..."
+    rm -rf "$BRS_IMAGE_DIR"
+}
 
-# Menu function  
-show_menu() {  
-    echo "------------------------"  
-    echo " BRS Build Menu"  
-    echo "------------------------"  
-    echo "1. Initialize Target Directory"  
-    echo "2. Compile Components"  
-    echo "3. Build Disk Image"  
-    echo "4. Install Components"  
-    echo "5. Clean Up"  
-    echo "6. Exit"  
-    echo "------------------------"  
-}  
+# Menu function
+show_menu() {
+    echo "------------------------"
+    echo " BRS Build Menu"
+    echo "------------------------"
+    echo "1. Initialize Target Directory"
+    echo "2. Compile Components"
+    echo "3. Build Disk Image"
+    echo "4. Install Components"
+    echo "5. Clean Up"
+    echo "6. Exit"
+    echo "------------------------"
+}
 
 show_menu_with_countdown() {
     local options=("Initialize" "Compile" "Build Image" "Install" "Clean" "Exit")
@@ -274,47 +274,47 @@ show_menu_with_countdown() {
     while true; do
         show_menu
 
-        countdown() {  
-            local remaining=10  
-            local selection=""  
-        
-            # Use stty to disable input buffering  
-            stty -icanon -echo min 0 time 10  
-        
-            while [ $remaining -gt 0 ]; do  
-                # Output countdown to stderr to ensure visibility  
-                printf "\r\033[K" >&2  
-                printf "Time remaining: %2d seconds | Select option (1-6): " "$remaining" >&2  
-            
-                # Non-blocking read  
-                read -t 1 input  
-            
-                # Process input immediately  
-                if [[ -n "$input" ]]; then  
-                    if [[ "$input" =~ ^[1-6]$ ]]; then  
-                        selection="$input"  
-                        break  
-                    fi  
-                fi  
-            
-                ((remaining--))  
-            done  
-        
-            # Restore terminal settings  
-            stty icanon echo  
-        
-            # Return selection or default to 'C'  
-            if [[ -z "$selection" ]]; then  
-                echo "C"  
-            else  
-                echo "$selection"  
-            fi  
-        }  
-    
-        # Get selection from countdown  
-        selection=$(countdown)  
+        countdown() {
+            local remaining=10
+            local selection=""
 
-        if [[ $selection == 'C' || -z "$selection" ]]; then 
+            # Use stty to disable input buffering
+            stty -icanon -echo min 0 time 10
+
+            while [ $remaining -gt 0 ]; do
+                # Output countdown to stderr to ensure visibility
+                printf "\r\033[K" >&2
+                printf "Time remaining: %2d seconds | Select option (1-6): " "$remaining" >&2
+
+                # Non-blocking read
+                read -t 1 input
+
+                # Process input immediately
+                if [[ -n "$input" ]]; then
+                    if [[ "$input" =~ ^[1-6]$ ]]; then
+                        selection="$input"
+                        break
+                    fi
+                fi
+
+                ((remaining--))
+            done
+
+            # Restore terminal settings
+            stty icanon echo
+
+            # Return selection or default to 'C'
+            if [[ -z "$selection" ]]; then
+                echo "C"
+            else
+                echo "$selection"
+            fi
+        }
+
+        # Get selection from countdown
+        selection=$(countdown)
+
+        if [[ $selection == 'C' || -z "$selection" ]]; then
             for i in {1..6}; do
                 case $i in
                     1)
@@ -369,5 +369,5 @@ show_menu_with_countdown() {
     done
 }
 
-# Start execute  
+# Start execute
 show_menu_with_countdown
