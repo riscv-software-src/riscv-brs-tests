@@ -246,6 +246,9 @@ brs_install() {
     # install scripts
     cp "$SCRIPTS_DIR/start_uefi_sct.sh" "$TARGET_DIR/"
     echo "Installation complete."
+
+    # install sbi test
+    cp "$SRC_DIR/brs-sbi-test/sbi-test/riscv/sbi.flat" "$TARGET_DIR/"
 }
 
 brs_clean() {

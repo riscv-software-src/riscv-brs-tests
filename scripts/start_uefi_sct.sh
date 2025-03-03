@@ -35,18 +35,39 @@ else
     exit 1
 fi
 
+if [ -z "$1" ]; then
+	echo "Please add parameters[1/2]:"
+        echo "1 : EDK2-TEST"
+        echo "2 : SIB-TEST"
+        exit 1
+fi
+
 echo "Starting rv64 qemu... press Ctrl+A, X to exit qemu"
 sleep 2
-$BRS_QEMU_RISCV64 -nographic \
-    -machine virt,aia=aplic-imsic,pflash0=pflash0,pflash1=pflash1 \
-    -cpu rv64 -m 4G -smp 2   \
-    -bios $BRS_BIOS \
-    -drive file=$BRS_IMAGE,if=none,format=raw,id=drv1 -device virtio-blk-device,drive=drv1  \
-    -blockdev node-name=pflash0,driver=file,read-only=on,filename=$BRS_RISCV_VIRT_CODE_FD \
-    -blockdev node-name=pflash1,driver=file,filename=$BRS_RISCV_VIRT_VARS_FD \
-    -device e1000,netdev=net0 \
-    -device virtio-gpu-pci \
-    -netdev type=user,id=net0 \
-    -device qemu-xhci \
-    -device usb-mouse \
-    -device usb-kbd
+
+if [ "$1" -eq 1 ]; then
+	$BRS_QEMU_RISCV64 -nographic \
+    		-machine virt,aia=aplic-imsic,pflash0=pflash0,pflash1=pflash1 \
+    		-cpu rv64 -m 4G -smp 2   \
+    		-bios $BRS_BIOS \
+    		-drive file=$BRS_IMAGE,if=none,format=raw,id=drv1 -device virtio-blk-device,drive=drv1  \
+    		-blockdev node-name=pflash0,driver=file,read-only=on,filename=$BRS_RISCV_VIRT_CODE_FD \
+    		-blockdev node-name=pflash1,driver=file,filename=$BRS_RISCV_VIRT_VARS_FD \
+    		-device e1000,netdev=net0 \
+    		-device virtio-gpu-pci \
+    		-netdev type=user,id=net0 \
+    		-device qemu-xhci \
+    		-device usb-mouse \
+    		-device usb-kbd
+
+elif [ "$1" -eq 2 ]; then
+        $BRS_QEMU_RISCV64 -nodefaults -nographic \
+                -serial mon:stdio \
+                -machine virt \
+                -accel tcg \
+                -cpu max \
+                -kernel ./sbi.flat
+else
+        echo "Invalid argument."
+        exit 1
+fi
