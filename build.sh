@@ -48,7 +48,7 @@ brs_init() {
 }
 
 brs_compile() {
-    local components=("linux" "grub" "edk2" "edk2-test" "buildroot" "opensbi" "sbi-test" "qemu")
+    local components=("linux" "grub" "edk2" "edk2-test" "buildroot" "opensbi" "sbi-test" "qemu" "fwts")
 
     echo "Select a component to compile:"
     for i in "${!components[@]}"; do
