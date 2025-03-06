@@ -40,15 +40,10 @@ brs-buildroot:
 			exit 1
 		fi
 
-		stg init
-		stg import -s ../patches/series
-
 		popd
 	fi
 
 	pushd buildroot
-	@echo "Installing fwts patches..."
-	cp ../patches/fwts/*.patch package/fwts/
 
 	@echo "Configuring Buildroot..."
 	cp ../config/buildroot_defconfig configs/

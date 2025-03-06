@@ -48,7 +48,7 @@ brs_init() {
 }
 
 brs_compile() {
-    local components=("linux" "grub" "edk2" "edk2-test" "buildroot" "opensbi" "sbi-test" "qemu")
+    local components=("linux" "grub" "edk2" "edk2-test" "buildroot" "opensbi" "sbi-test" "qemu" "fwts")
 
     echo "Select a component to compile:"
     for i in "${!components[@]}"; do
@@ -246,6 +246,9 @@ brs_install() {
     # install scripts
     cp "$SCRIPTS_DIR/start_uefi_sct.sh" "$TARGET_DIR/"
     echo "Installation complete."
+
+    # install sbi test
+    cp "$SRC_DIR/brs-sbi-test/sbi-test/riscv/sbi.flat" "$TARGET_DIR/"
 }
 
 brs_clean() {

@@ -18,9 +18,9 @@ SHELL = /bin/bash
 
 BRS_LINUX_CROSS_COMPILE = riscv64-linux-gnu-
 BRS_LINUX_TARGET = brs-linux
-BRS_LINUX_REPOURL = git@github.com:vlsunil/linux.git
+BRS_LINUX_REPOURL = git@github.com:torvalds/linux.git
 BRS_LINUX_BRANCH = brs-test
-BRS_LINUX_BRANCH_REMOTE = origin/acpi_b2_v2_riscv_aia_v11
+BRS_LINUX_BRANCH_REMOTE = v6.12
 # BRS_LINUX_COMMIT = ac5e19d018afa8a37761510bd233ca319a763c42
 
 .PHONY: brs-linux

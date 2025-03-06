@@ -18,10 +18,10 @@ SHELL = /bin/bash
 
 BRS_SBI_TEST_CROSS_COMPILE = riscv64-linux-gnu-
 BRS_SBI_TEST_TARGET = brs-sbi-test
-BRS_SBI_TEST_REPOURL = https://gitlab.com/jones-drew/kvm-unit-tests.git
+BRS_SBI_TEST_REPOURL = https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
 BRS_SBI_TEST_BRANCH = brs-test
-BRS_SBI_TEST_BRANCH_REMOTE = riscv/x-tests
-# BRS_SBI_TEST_COMMIT = bbd7e8faa2b31ebb44c54fa6e5d7ee371c56cd11
+# BRS_SBI_TEST_BRANCH_REMOTE = riscv/x-tests
+BRS_SBI_TEST_COMMIT = 0ed2cdf3c80ee803b9150898e687e77e4d6f5db2
 
 .PHONY: brs-sbi-test
 brs-sbi-test:
@@ -29,8 +29,7 @@ brs-sbi-test:
 	@if [ ! -d "sbi-test" ]; then \
 		git clone --progress $(BRS_SBI_TEST_REPOURL) sbi-test;
 		pushd sbi-test
-		@git checkout -b $(BRS_SBI_TEST_BRANCH)
-		@git branch --set-upstream-to=origin/$(BRS_SBI_TEST_BRANCH_REMOTE) $(BRS_SBI_TEST_BRANCH)
+		@git checkout -b $(BRS_SBI_TEST_BRANCH) $(BRS_SBI_TEST_COMMIT)
 		@git pull --rebase
 
 		popd
