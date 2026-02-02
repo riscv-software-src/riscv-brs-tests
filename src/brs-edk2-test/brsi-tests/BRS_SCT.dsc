@@ -135,10 +135,10 @@
 [Libraries.AARCH64]
   ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
-[Libraries.RISCV64]
-  ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-
 !include MdePkg/MdeLibs.dsc.inc
+
+[LibraryClasses.RISCV64]
+  NULL|MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 [LibraryClasses.common]
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
@@ -166,9 +166,6 @@
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 [LibraryClasses.AARCH64]
-  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-
-[LibraryClasses.RISCV64]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 ###############################################################################
