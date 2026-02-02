@@ -1,20 +1,21 @@
-From c1fdeb7062c0bea91d7f3af822a0583cd6256baf Mon Sep 17 00:00:00 2001
-From: Zhu Hengbo <zhuhengbo@iscas.ac.cn>
-Date: Tue, 29 Oct 2024 01:29:00 +0000
+From 5223e1a1880067811b6a879666b1404fd69bca2c Mon Sep 17 00:00:00 2001
+From: Sunil V L <sunilvl@oss.qualcomm.com>
+Date: Thu, 29 Jan 2026 10:08:54 +0530
 Subject: [PATCH] edk2-test-brs-build
 
 Signed-off-by: Zhu Hengbo <zhuhengbo@iscas.ac.cn>
+Signed-off-by: Sunil V L <sunilvl@oss.qualcomm.com>
 ---
  uefi-sct/SctPkg/CommonGenFramework.sh    | 181 +++++++++++++++++++++++
  uefi-sct/SctPkg/Config/Data/Category.ini |  28 ++++
  2 files changed, 209 insertions(+)
 
 diff --git a/uefi-sct/SctPkg/CommonGenFramework.sh b/uefi-sct/SctPkg/CommonGenFramework.sh
-index fb9043b5..1a9f6490 100755
+index 194fdd4a..cb5e1e97 100755
 --- a/uefi-sct/SctPkg/CommonGenFramework.sh
 +++ b/uefi-sct/SctPkg/CommonGenFramework.sh
-@@ -273,6 +273,187 @@ then
-     CopyDependency ConfigKeywordHandler
+@@ -307,6 +307,187 @@ then
+   fi
  fi
  
 +# *********************************************
@@ -202,7 +203,7 @@ index fb9043b5..1a9f6490 100755
  # For IHV SCT
  # *********************************************
 diff --git a/uefi-sct/SctPkg/Config/Data/Category.ini b/uefi-sct/SctPkg/Config/Data/Category.ini
-index b34d35db..225db967 100644
+index fcbd220e..d7265c69 100644
 --- a/uefi-sct/SctPkg/Config/Data/Category.ini
 +++ b/uefi-sct/SctPkg/Config/Data/Category.ini
 @@ -88,6 +88,20 @@ InterfaceGuid = 71652D04-BF38-434A-BCB8-6547D7FD8384
@@ -249,11 +250,11 @@ index b34d35db..225db967 100644
 +CategoryGuid  = 1C3C483B-3BA3-42AB-80EC-5AE79D31F193
 +InterfaceGuid = AFF115FB-387B-4c18-8C41-6AFC7F03BB90
 +Name          = RuntimeServicesTest\BRSIRuntimeServicesTest
-+Description   = RRSI Runtime Services Tests
++Description   = BRSI Runtime Services Tests
 +
  [Category Data]
  Revision      = 0x00010000
- CategoryGuid  = 5B1B31A1-9562-11D2-8E3F-00A0C969723B
+ CategoryGuid  = 265E661D-D51E-454B-BBC9-665F46EC0A04
 -- 
-2.34.1
+2.43.0
 
