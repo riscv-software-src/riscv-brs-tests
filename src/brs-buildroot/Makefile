@@ -20,7 +20,7 @@ SHELL = /bin/bash
 # BRS_BUILDROOT_CROSS_COMPILE = riscv64-linux-gnu-
 BRS_BUILDROOT_TARGET = brs-buildroot
 BRS_BUILDROOT_REPOURL = git@github.com:buildroot/buildroot.git
-BRS_BUILDROOT_TAG = 2023.11
+BRS_BUILDROOT_TAG = 2025.11
 BRS_BUILDROOT_BRANCH = brs-test
 BRS_BUILDROOT_OUPUT_PATH = output
 
