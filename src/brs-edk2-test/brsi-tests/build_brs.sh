@@ -55,7 +55,7 @@ function set_cross_compile
 	    if [ X"$CROSS_COMPILE_64" != X"" ]; then
 	        TEMP_CROSS_COMPILE="$CROSS_COMPILE_64"
 	    else
-	        TEMP_CROSS_COMPILE=riscv64-unknown-elf-
+	        TEMP_CROSS_COMPILE=riscv64-linux-gnu-
 	    fi
 	else
 	    echo "Unsupported target architecture '$SCT_TARGET_ARCH'!" >&2
