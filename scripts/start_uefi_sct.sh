@@ -38,7 +38,7 @@ fi
 if [ -z "$1" ]; then
 	echo "Please add parameters[1/2]:"
         echo "1 : EDK2-TEST"
-        echo "2 : SIB-TEST"
+        echo "2 : SBI-TEST"
         exit 1
 fi
 
