@@ -18,7 +18,7 @@ SHELL = /bin/bash
 
 BRS_EDK2_TEST_CROSS_COMPILE = riscv64-linux-gnu-
 BRS_EDK2_TEST_TARGET = brs-edk2-test
-BRS_EDK2_TEST_REPOURL = git@github.com:tianocore/edk2-test.git
+BRS_EDK2_TEST_REPOURL = https://github.com/tianocore/edk2-test.git
 BRS_EDK2_TEST_BRANCH = brs-test
 BRS_EDK2_TEST_COMMIT = 2b2a16ac239cd89d778cb79ae6e42c533fc4c25a
 

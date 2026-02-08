@@ -18,7 +18,7 @@ SHELL = /bin/bash
 
 BRS_LINUX_CROSS_COMPILE = riscv64-linux-gnu-
 BRS_LINUX_TARGET = brs-linux
-BRS_LINUX_REPOURL = git@github.com:torvalds/linux.git
+BRS_LINUX_REPOURL = https://github.com/torvalds/linux.git
 BRS_LINUX_BRANCH = brs-test
 BRS_LINUX_BRANCH_REMOTE = v6.19
 # BRS_LINUX_COMMIT = ac5e19d018afa8a37761510bd233ca319a763c42
@@ -28,10 +28,12 @@ brs-linux:
 	@echo "Building BRS Linux..."
 	@if [ ! -d "linux" ]; then
 		echo "Cloning BRS linux source..."
-		git clone --progress $(BRS_LINUX_REPOURL) linux
+		git clone  -c advice.detachedHead=false --depth 1 \
+			--single-branch --branch $(BRS_LINUX_BRANCH_REMOTE) \
+			--progress $(BRS_LINUX_REPOURL) linux
 
 		pushd linux
-		git checkout -b $(BRS_LINUX_BRANCH) $(BRS_LINUX_BRANCH_REMOTE)
+		git checkout -b $(BRS_LINUX_BRANCH)
 		popd
 	fi
 
