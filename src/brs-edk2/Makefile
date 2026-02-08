@@ -18,7 +18,7 @@ SHELL = /bin/bash
 
 BRS_EDK2_CROSS_COMPILE = riscv64-linux-gnu-
 BRS_EDK2_TARGET = brs-edk2
-BRS_EDK2_REPOURL = git@github.com:tianocore/edk2.git
+BRS_EDK2_REPOURL = https://github.com/tianocore/edk2.git
 BRS_EDK2_BRANCH = brs-test
 BRS_EDK2_TAG = edk2-stable202508
 
