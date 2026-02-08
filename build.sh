@@ -48,7 +48,7 @@ brs_init() {
 }
 
 brs_compile() {
-    local components=("linux" "grub" "edk2" "edk2-test" "buildroot" "opensbi" "sbi-test" "qemu" "fwts")
+    local components=("linux" "grub" "edk2" "edk2-test" "buildroot" "opensbi" "sbi-test" "qemu")
 
     echo "Select a component to compile:"
     for i in "${!components[@]}"; do
@@ -68,7 +68,7 @@ brs_compile() {
         while [ $remaining -gt 0 ]; do
             # Output countdown to stderr to ensure visibility
             printf "\r\033[K" >&2
-            printf "Time remaining: %2d seconds | Select option (1-9, C, 0): " "$remaining" >&2
+	    printf "Time remaining: %2d seconds | Select option (1-8, C (default), 0): " "$remaining" >&2
 
             # Non-blocking read
             read -t 1 input
