@@ -274,6 +274,18 @@ show_menu() {
 show_menu_with_countdown() {
     local options=("Initialize" "Compile" "Build Image" "Install" "Clean" "Exit")
 
+    # To keep stgit happy, update this if required.
+    if git config --global user.email; then
+	    echo "User email is set"
+    else
+	    git config --global user.email "your.email@example.com"
+    fi
+    if git config --global user.name; then
+	    echo "User name is set"
+    else
+	    git config --global user.name "Your Name"
+    fi
+
     while true; do
         show_menu
 
