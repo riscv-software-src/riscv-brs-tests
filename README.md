@@ -10,9 +10,9 @@ Used for simplifying the construction process of related test projects. There ar
 
 Before running, make sure that you have installed these packages:
 
-        curl mtools gdisk gcc openssl automake autotools-dev libtool bison flex bc uuid-dev python3 	libglib2.0-dev libssl-dev autopoint gcc-riscv64-unknown-elf gcc g++
+acpica-tools automake autopoint autotools-dev bc bison bzip2 cpio curl dosfstools flex gawk gcc gcc-riscv64-linux-gnu gdisk gettext g++ iasl libglib2.0-dev libpixman-1-dev libssl-dev libtool make mtools ninja-build openssl patch python3 python3-venv rsync stgit unzip uuid-dev vim wget
 
-At the same time, please build on Ubuntu 22.04 and ensure at least 30GB of free disk space.
+At the same time, please build on Ubuntu 24.04 and ensure at least 30GB of free disk space.
 
 ## Structure
 
@@ -33,7 +33,6 @@ The structure of this repository is listed below:
         ¦    ├── brs-opensbi
         ¦    ├── brs-qemu
         ¦    ├── brs-sbi-test
-        ¦    └── brs-fwts
         ├── .gitgnore
         ├── LICENSE
         ├── NOTICE
@@ -58,7 +57,7 @@ Run build.sh, firstly you will see start menu. There are 6 options in this menu:
 If you don't make any choice within 10 seconds, the script will execute all choices.
 
 Specially, if you choose "Compile Components",
-you will see a menu which contains 11 options:
+you will see a menu which contains 10 options:
 
         1. linux
         2. grub
@@ -68,22 +67,20 @@ you will see a menu which contains 11 options:
         6. opensbi
         7. sbi-test
         8. qemu
-        9. fwts
         C. Compile All Components
         0. Back to main menu
 
 Similar with last menu, if you don't make any choice within 10 seconds, all components will be compiled. The sources of these components are as follows:
 | project   | source                                               | tag/branch                               |
 | --------- | ---------------------------------------------------- | ---------------------------------------- |
-| buildroot | https://github.com/buildroot/buildroot.git           | 2023.11                                  |
-| edk2-test | https://github.com/tianocore/edk2-test.git           | 81dfa8d53d4290366ae41e1f4c2ed6d6c5016c07 |
-| edk2      | https://github.com/tianocore/edk2.git                | edk2-stable202308                        |
+| buildroot | https://github.com/buildroot/buildroot.git           | 2025.11                                  |
+| edk2-test | https://github.com/tianocore/edk2-test.git           | 2b2a16ac239cd89d778cb79ae6e42c533fc4c25a |
+| edk2      | https://github.com/tianocore/edk2.git                | edk2-stable202508                        |
 | grub      | https://git.savannah.gnu.org/git/grub.git            | grub-2.12                                |
-| linux     | https://github.com/torvalds/linux.git                | v6.12                                    |
-| opensbi   | https://github.com/riscv-software-src/opensbi.git    | v1.4                                     |
-| qemu      | https://github.com/qemu/qemu.git                     | v9.0.0                                   |
+| linux     | https://github.com/torvalds/linux.git                | v6.19                                    |
+| opensbi   | https://github.com/riscv-software-src/opensbi.git    | v1.8.1                                    |
+| qemu      | https://github.com/qemu/qemu.git                     | v10.2.0                                   |
 | SBI-test  | https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git | v2024-01-08                              |
-| fwts      | https://github.com/fwts/fwts.git                     | V24.11.00                                |
 |           |                                                      |                                          |
 
 After executing the build.sh, you will see a directory named 'target'. Enter this directory and run start_uefi_sct.sh.
