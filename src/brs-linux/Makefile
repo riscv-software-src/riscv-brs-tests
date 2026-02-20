@@ -40,7 +40,7 @@ brs-linux:
 	@pushd linux
 	@echo "Compiling Linux kernel..."
 	@make ARCH=riscv CROSS_COMPILE=$(BRS_LINUX_CROSS_COMPILE) defconfig
-	@make ARCH=riscv CROSS_COMPILE=$(BRS_LINUX_CROSS_COMPILE) -j$(nproc)
+	@make ARCH=riscv CROSS_COMPILE=$(BRS_LINUX_CROSS_COMPILE) -j`nproc --ignore=2`
 
 	@echo "BRS Linux build complete."
 	popd
