@@ -78,9 +78,9 @@ Similar with last menu, if you don't make any choice within 10 seconds, all comp
 | edk2      | https://github.com/tianocore/edk2.git                | edk2-stable202508                        |
 | grub      | https://git.savannah.gnu.org/git/grub.git            | grub-2.12                                |
 | linux     | https://github.com/torvalds/linux.git                | v6.19                                    |
-| opensbi   | https://github.com/riscv-software-src/opensbi.git    | v1.8.1                                    |
-| qemu      | https://github.com/qemu/qemu.git                     | v10.2.0                                   |
-| SBI-test  | https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git | v2024-01-08                              |
+| opensbi   | https://github.com/riscv-software-src/opensbi.git    | v1.8.1                                   |
+| qemu      | https://github.com/qemu/qemu.git                     | v10.2.0                                  |
+| SBI-test  | https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git | v2025-07-3                               |
 |           |                                                      |                                          |
 
 After executing the build.sh, you will see a directory named 'target'. Enter this directory and run start_uefi_sct.sh.

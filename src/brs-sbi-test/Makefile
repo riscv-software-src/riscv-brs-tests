@@ -21,7 +21,7 @@ BRS_SBI_TEST_TARGET = brs-sbi-test
 BRS_SBI_TEST_REPOURL = https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
 BRS_SBI_TEST_BRANCH = brs-test
 # BRS_SBI_TEST_BRANCH_REMOTE = riscv/x-tests
-BRS_SBI_TEST_COMMIT = 0ed2cdf3c80ee803b9150898e687e77e4d6f5db2
+BRS_SBI_TEST_TAG = v2025-07-31
 
 .PHONY: brs-sbi-test
 brs-sbi-test:
@@ -29,8 +29,7 @@ brs-sbi-test:
 	@if [ ! -d "sbi-test" ]; then \
 		git clone --progress $(BRS_SBI_TEST_REPOURL) sbi-test;
 		pushd sbi-test
-		@git checkout -b $(BRS_SBI_TEST_BRANCH) $(BRS_SBI_TEST_COMMIT)
-		@git pull --rebase
+		@git checkout -b $(BRS_SBI_TEST_BRANCH) $(BRS_SBI_TEST_TAG)
 
 		popd
 	fi
