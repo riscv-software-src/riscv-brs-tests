@@ -111,7 +111,7 @@ BBTestMemoryMapTest (
   Status = gtBS->HandleProtocol (
               SupportHandle,
               &gEfiStandardTestLibraryGuid,
-              &StandardLib
+              (void**)&StandardLib
               );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -276,7 +276,6 @@ BBTestAcpiTableTest (
   UINTN                               IStatus;
   EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER     *AcpiTable;
   UINT8                               Checksum;
-  UINT32                              i;
 
   //
   // Get the Standard Library Interface
@@ -284,7 +283,7 @@ BBTestAcpiTableTest (
   Status = gtBS->HandleProtocol (
               SupportHandle,
               &gEfiStandardTestLibraryGuid,
-              &StandardLib
+              (VOID**)&StandardLib
               );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -295,7 +294,7 @@ BBTestAcpiTableTest (
   //
   Status = SctGetSystemConfigurationTable (
               &gEfiAcpi20TableGuid,
-              &AcpiTable
+              (VOID**)&AcpiTable
               );
   if (EFI_ERROR (Status)){
     StandardLib->RecordAssertion (
@@ -439,7 +438,7 @@ BBTestSmbiosTableTest (
   Status = gtBS->HandleProtocol (
               SupportHandle,
               &gEfiStandardTestLibraryGuid,
-              &StandardLib
+              (VOID**)&StandardLib
               );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -450,7 +449,7 @@ BBTestSmbiosTableTest (
   //
   Status = SctGetSystemConfigurationTable (
               &gEfiSmbios3TableGuid,
-              &SmbiosTable
+              (VOID**)&SmbiosTable
               );
   if (EFI_ERROR(Status)) {
     StandardLib->RecordAssertion (
