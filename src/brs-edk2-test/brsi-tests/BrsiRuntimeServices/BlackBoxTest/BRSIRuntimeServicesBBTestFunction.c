@@ -436,7 +436,7 @@ BBTestNonVolatileVariable (
     Status = gtRT->SetVariable (
                 TEST_VAR_NAME,
                 &VarVendorGuid,
-                NULL,
+                0,
                 Size,
                 NULL
                 );
@@ -537,7 +537,7 @@ BBTestNonVolatileVariable (
     Status = gtRT->SetVariable (
                 TEST_VAR_NAME,
                 &VarVendorGuid,
-                NULL,
+                0,
                 Size,
                 NULL
                 );
